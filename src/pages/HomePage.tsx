@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { getUserTests, createTest, deleteTest } from "../lib/db";
+import { getUserTests, createTest } from "../lib/db";
 import { AI_PROMPT } from "../lib/constants";
 import { Modal } from "../components/Modal";
 import type { Test } from "../types";
@@ -79,17 +79,6 @@ export default function HomePage() {
     }
   }
 
-  async function handleDelete(
-    e: React.MouseEvent,
-    id: string,
-    testTitle: string,
-  ) {
-    e.stopPropagation();
-    if (!window.confirm(`Delete "${testTitle}" and all its attempts?`)) return;
-    await deleteTest(id, user!.uid);
-    setTests((prev) => prev.filter((t) => t.id !== id));
-  }
-
   function copyPrompt() {
     navigator.clipboard.writeText(AI_PROMPT);
     setCopied(true);
@@ -158,14 +147,7 @@ export default function HomePage() {
                       {test.totalQuestions} questions · {test.timerMinutes} min
                     </p>
                   </div>
-                  {/* Delete — intentionally low-visibility */}
-                  <button
-                    onClick={(e) => handleDelete(e, test.id, test.title)}
-                    className="text-[10px] text-surface2 group-hover:text-muted transition-colors mt-0.5 shrink-0"
-                    title="Delete test"
-                  >
-                    delete
-                  </button>
+                  <span className="text-xs text-muted">→</span>
                 </div>
               </div>
             ))}

@@ -7,6 +7,7 @@ import {
   getInProgressAttempt,
   createAttempt,
   discardAttempt,
+  deleteTest,
 } from "../lib/db";
 import { format } from "date-fns";
 import type { Test, Attempt } from "../types";
@@ -22,6 +23,15 @@ export default function TestDetailPage() {
   const [inProgress, setInProgress] = useState<Attempt | null>(null);
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  async function handleDelete() {
+    if (!test || !user) return;
+    setMenuOpen(false);
+    if (!window.confirm(`Delete "${test.title}" and all its attempts?`)) return;
+    await deleteTest(test.id, user.uid);
+    navigate("/");
+  }
 
   const load = useCallback(() => {
     if (!testId || !user) return;
@@ -98,9 +108,34 @@ export default function TestDetailPage() {
         >
           ← Back
         </button>
-        <h1 className="font-semibold text-text text-sm truncate">
+        <h1 className="font-semibold text-text text-sm truncate flex-1">
           {test.title}
         </h1>
+        <div className="relative">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            className="text-muted hover:text-text transition-colors px-2 py-1 text-base leading-none"
+            title="More options"
+          >
+            ⋯
+          </button>
+          {menuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-10"
+                onClick={() => setMenuOpen(false)}
+              />
+              <div className="absolute right-0 top-full mt-1 z-20 bg-surface border border-border rounded-lg shadow-xl min-w-32.5 py-1">
+                <button
+                  onClick={handleDelete}
+                  className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-surface2 transition-colors"
+                >
+                  Delete test
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
