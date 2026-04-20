@@ -54,6 +54,7 @@ export default function TestDetailPage() {
 
   async function handleStart() {
     if (!test || !user) return;
+    if (!window.confirm(`Start a new attempt for "${test.title}"?`)) return;
     setStarting(true);
     const id = await createAttempt(user.uid, test);
     navigate(`/attempts/${id}`);
